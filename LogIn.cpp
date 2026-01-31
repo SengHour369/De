@@ -6,7 +6,7 @@
 
 #include "AppUser.h"
 
-LogIn::LogIn(UserService userService, Admin admin,RestaurantService restaurantService) {
+LogIn::LogIn(UserService userService, Admin admin,RestaurantService restaurantService,OrderService& orderService) {
     int n;
 
     do{
@@ -52,7 +52,7 @@ LogIn::LogIn(UserService userService, Admin admin,RestaurantService restaurantSe
                     admin.runAdminMenu();
                 }
                 else {
-                    new AppUser(userService,restaurantService);
+                    new AppUser(userService,restaurantService, orderService);
                 }
 
                 break;

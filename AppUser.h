@@ -4,12 +4,13 @@
 
 #ifndef RESTAURANT_PROJECT_APPUSER_H
 #define RESTAURANT_PROJECT_APPUSER_H
+#include "OrderService.h"
 #include "RestaurantService.h"
 #include "UserService.h"
 
 
 class AppUser {
-public : AppUser( UserService userService,RestaurantService restaurantService);
+public : AppUser( UserService userService,RestaurantService restaurantService,OrderService& orderService);
 };
 
 

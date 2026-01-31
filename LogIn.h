@@ -5,11 +5,11 @@
 #ifndef RESTAURANT_PROJECT_LOGIN_H
 #define RESTAURANT_PROJECT_LOGIN_H
 #include "Admin.h"
-
+#include "OrderService.h"
 
 
 class LogIn {
-    public:LogIn(UserService user,Admin admin,RestaurantService restaurantService);
+    public:LogIn(UserService user,Admin admin,RestaurantService restaurantService,OrderService& orderService31);
 };
 
 

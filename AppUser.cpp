@@ -7,6 +7,9 @@
 #include <iostream>
 #include <string>
 
+#include "Order.h"
+#include "OrderService.h"
+
 using namespace std;
 void displayUserMenu() {
     cout << "1. View Profile\n";
@@ -28,7 +31,8 @@ void displayRestaurantMenu() {
 }
 void displayProfile() {
     cout << "1. View Profile\n";
-    cout << "1. View Restaurants\n";
+    cout << "2. View Restaurants\n";
+    cout << "3. Order Management\n";
     cout << "Enter your choice: ";
 }
 //
@@ -42,9 +46,199 @@ void displayProfile() {
 //     cout << "6. Back to Main Menu\n";
 //     cout << "Enter your choice: ";
 // }
+void displayOrderMenu() {
+    cout << "\n=== ORDER MANAGEMENT ===\n";
+    cout << "1. Create New Order\n";
+    cout << "2. View My Orders\n";
+    cout << "3. Cancel Order\n";
+    cout << "4. View Order Details\n";
+    cout << "5. Process Payment\n";
+    cout << "6. Back to Main Menu\n";
+    cout << "Enter your choice: ";
+}
 
+void handleOrderManagement(UserService& userService, RestaurantService& restaurantService,
+                          OrderService& orderService) {
+    int orderChoice;
+    bool inOrderMenu = true;
 
-AppUser::AppUser( UserService userService,RestaurantService restaurantService) {
+    while (inOrderMenu) {
+        displayOrderMenu();
+        cin >> orderChoice;
+        cin.ignore();
+
+        switch (orderChoice) {
+            case 1: {
+                // Create order logic
+                User* currentUser = userService.getCurrentUser();
+                if (!currentUser) {
+                    cout << "Please login first!\n";
+                    break;
+                }
+
+                // Show available restaurants
+                vector<Restaurant> restaurants = restaurantService.getAllRestaurants();
+                if (restaurants.empty()) {
+                    cout << "No restaurants available!\n";
+                    break;
+                }
+
+                cout << "\n=== AVAILABLE RESTAURANTS ===\n";
+                for (const Restaurant& rest : restaurants) {
+                    cout << "ID: " << rest.getId()
+                         << " | Name: " << rest.getName()
+                         << " | Location: " << rest.getLocation() << "\n";
+                }
+
+                int restaurantId;
+                cout << "Enter restaurant ID: ";
+                cin >> restaurantId;
+                cin.ignore();
+
+                Restaurant* restaurant = restaurantService.getRestaurantById(restaurantId);
+                if (!restaurant) {
+                    cout << "Restaurant not found!\n";
+                    break;
+                }
+
+                // Show menu items
+                vector<MenuItem> menu = restaurantService.getMenuByRestaurant(restaurantId);
+                if (menu.empty()) {
+                    cout << "No menu items available!\n";
+                    break;
+                }
+
+                cout << "\n=== MENU ITEMS ===\n";
+                for (const MenuItem& item : menu) {
+                    if (item.getAvailable()) {
+                        cout << "ID: " << item.getId()
+                             << " | " << item.getName()
+                             << " - $" << item.getPrice() << "\n";
+                        cout << "   " << item.getDescription() << "\n";
+                    }
+                }
+
+                vector<MenuItem> selectedItems;
+                int itemId;
+                char moreItems = 'y';
+
+                while (moreItems == 'y' || moreItems == 'Y') {
+                    cout << "Enter menu item ID: ";
+                    cin >> itemId;
+                    cin.ignore();
+
+                    // Find and add the menu item
+                    for (const MenuItem& item : menu) {
+                        if (item.getId() == itemId && item.getAvailable()) {
+                            selectedItems.push_back(item);
+                            cout << "Added: " << item.getName() << "\n";
+                            break;
+                        }
+                    }
+
+                    cout << "Add more items? (y/n): ";
+                    cin >> moreItems;
+                    cin.ignore();
+                }
+
+                if (selectedItems.empty()) {
+                    cout << "No items selected!\n";
+                    break;
+                }
+
+                string paymentType;
+                cout << "Enter payment type (Cash/Card): ";
+                getline(cin, paymentType);
+
+                Order* newOrder = orderService.createOrder(currentUser, restaurant,
+                                                          selectedItems, paymentType);
+                if (newOrder) {
+                    cout << "Order created successfully! ID: " << newOrder->getId() << "\n";
+                }
+                break;
+            }
+
+            case 2: {
+                User* currentUser = userService.getCurrentUser();
+                if (!currentUser) {
+                    cout << "Please login first!\n";
+                    break;
+                }
+
+                vector<Order*> userOrders = orderService.getOrdersByUser(currentUser->getId());
+                cout << "\n=== MY ORDERS ===\n";
+                if (userOrders.empty()) {
+                    cout << "No orders found!\n";
+                } else {
+                    for (Order* order : userOrders) {
+                        cout << "Order ID: " << order->getId()
+                             << " | Total: $" << order->getTotalPrice()
+                             << " | Status: " << order->getStatus() << "\n";
+                        cout << "Restaurant: " << order->getRestaurant()->getName() << "\n";
+                        cout << "--------------------------------\n";
+                    }
+                }
+                break;
+            }
+
+            case 3: {
+                int orderId;
+                cout << "Enter order ID to cancel: ";
+                cin >> orderId;
+                cin.ignore();
+
+                if (orderService.cancelOrder(orderId)) {
+                    cout << "Order cancelled successfully!\n";
+                } else {
+                    cout << "Failed to cancel order!\n";
+                }
+                break;
+            }
+
+            case 4: {
+                int orderId;
+                cout << "Enter order ID: ";
+                cin >> orderId;
+                cin.ignore();
+
+                Order* order = orderService.getOrderById(orderId);
+                if (order) {
+                    cout << "\n=== ORDER DETAILS ===\n";
+                    cout << order->getOrderSummary();
+                } else {
+                    cout << "Order not found!\n";
+                }
+                break;
+            }
+
+            case 5: {
+                int orderId;
+                cout << "Enter order ID to process payment: ";
+                cin >> orderId;
+                cin.ignore();
+
+                Order* order = orderService.getOrderById(orderId);
+                if (order && order->getPayment()) {
+                    if (orderService.processPayment(order->getPayment()->getId())) {
+                        cout << "Payment processed successfully!\n";
+                    }
+                } else {
+                    cout << "Order or payment not found!\n";
+                }
+                break;
+            }
+
+            case 6:
+                inOrderMenu = false;
+                break;
+
+            default:
+                cout << "Invalid choice!\n";
+        }
+    }
+}
+
+AppUser::AppUser( UserService userService,RestaurantService restaurantService,OrderService& orderService) {
     int userChoice;
     bool inUserMenu = true;
     int n;
@@ -222,9 +416,15 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService) {
 
                 }
                 break;
+
+            }
+            case 3: {
+                handleOrderManagement( userService,  restaurantService,
+                          orderService);
+                break;
             }
         }
-    }while (n != 3);
+    }while (n != 4);
 }
 
 
