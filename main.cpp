@@ -1,4 +1,4 @@
-// Main.cpp
+
 #include <iostream>
 #include "UserService.h"
 #include "RestaurantService.h"
@@ -52,31 +52,30 @@ void displayOrderMenu() {
     cout << "Enter your choice: ";
 }
 
-// Function to save all data
+
 void saveAllData(UserService& userService, RestaurantService& restaurantService,
                  MenuItemService& menuItemService, OrderService& orderService) {
     cout << "\n=== SAVING ALL DATA ===\n";
     if (userService.saveToFile()) {
-        cout << "✓ Users saved successfully!\n";
+        cout << " Users saved successfully!\n";
     } else {
-        cout << "✗ Failed to save users!\n";
+        cout << " Failed to save users!\n";
     }
 
     if (restaurantService.saveToFile()) {
-        cout << "✓ Restaurants saved successfully!\n";
+        cout << " Restaurants saved successfully!\n";
     } else {
-        cout << "✗ Failed to save restaurants!\n";
+        cout << " Failed to save restaurants!\n";
     }
 
     if (menuItemService.saveToFile()) {
-        cout << "✓ Menu items saved successfully!\n";
+        cout << " Menu items saved successfully!\n";
     } else {
-        cout << "✗ Failed to save menu items!\n";
+        cout << " Failed to save menu items!\n";
     }
     cout << "Data save completed!\n";
 }
 
-// Function to load all data
 void loadAllData(UserService& userService, RestaurantService& restaurantService,
                 MenuItemService& menuItemService, OrderService& orderService) {
     cout << "\n=== LOADING ALL DATA ===\n";
@@ -106,12 +105,12 @@ int main() {
     UserService userService("users.dat");
     MenuItemService menuItemService("menuitems.dat");
     RestaurantService restaurantService("restaurants.dat");
-    // OrderService doesn't have file storage yet
+
     OrderService orderService;
 
     restaurantService.setMenuItemService(&menuItemService);
 
-    // Initialize admin
+
     Admin admin(restaurantService, menuItemService, userService);
 
     int mainChoice;
@@ -340,7 +339,7 @@ int main() {
             }
 
             case 3: {
-                // Order Management (unchanged from original)
+
                 cout << "\nNote: Order management requires additional modifications\n";
                 cout << "for file storage. Currently using in-memory storage only.\n";
 
