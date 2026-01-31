@@ -30,4 +30,8 @@ add_executable(Restaurant_project main.cpp
         MenuItemService.h
         FileStorage.cpp
         FileStorage.h
+        AppUser.cpp
+        AppUser.h
+        LogIn.cpp
+        LogIn.h
 )

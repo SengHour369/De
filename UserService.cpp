@@ -69,21 +69,20 @@ bool UserService::registerUser(const string& username, const string& password,
     return true;
 }
 
-bool UserService::login(const string& username, const string& password) {
+User UserService::login(const string& username, const string& password) {
     for (User& user : users) {
         if (user.getUsername() == username && user.getPassword() == password) {
             if (user.getStatus() == "Active") {
                 currentUserId = user.getId();
                 cout << "Login successful! Welcome " << username << "\n";
-                return true;
+                return user;
             } else {
                 cout << "Account is not active!\n";
-                return false;
             }
         }
     }
     cout << "Invalid username or password!\n";
-    return false;
+
 }
 
 bool UserService::logout() {

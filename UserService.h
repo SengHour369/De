@@ -24,7 +24,7 @@ public:
                      const string& email, const string& phone_number,
                      const string& address, const string& role);
 
-    bool login(const string& username, const string& password);
+    User login(const string& username, const string& password);
     bool logout();
     bool updateProfile(const User& updatedUser);
     bool changePassword(const string& oldPassword, const string& newPassword);
