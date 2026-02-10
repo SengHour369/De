@@ -1,4 +1,4 @@
-// RestaurantService.h
+
 #ifndef RESTAURANT_PROJECT_RESTAURANTSERVICE_H
 #define RESTAURANT_PROJECT_RESTAURANTSERVICE_H
 
@@ -30,10 +30,15 @@ public:
     bool rateRestaurant(int id, int rating);
 
 
+
     Restaurant* getRestaurantById(int id);
     Restaurant* getRestaurantByName(const string& name);
     vector<Restaurant> getAllRestaurants() const;
     vector<MenuItem> getMenuByRestaurant(int restaurantId) const;
+    void header();
+    void displayRestaurants(vector<Restaurant> restaurants);
+    vector<Restaurant> sortByName();
+
 
 
     void setMenuItemService(MenuItemService* service);

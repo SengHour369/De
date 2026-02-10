@@ -2,13 +2,14 @@
 #define RESTAURANT_PROJECT_ORDER_H
 
 #include <string>
+#include <vector>
+#include "MenuItem.h"
 using namespace std;
 
 
-class OrderItem;
-class Payment;
-class Restaurant;
 class User;
+class Restaurant;
+class Payment;
 
 class Order {
 private:
@@ -16,14 +17,14 @@ private:
     double totalPrice;
     User* user;
     Restaurant* restaurant;
-    OrderItem* orderItem;
+    vector<MenuItem> items;
     Payment* payment;
     string status;
 
 public:
     Order();
     Order(int id, double price, User* user, Restaurant* restaurant,
-          OrderItem* orderItem, Payment* payment, const string& status = "Pending");
+          const vector<MenuItem>& items, Payment* payment, const string& status = "Pending");
     ~Order();
 
 
@@ -31,7 +32,7 @@ public:
     double getTotalPrice() const;
     User* getUser() const;
     Restaurant* getRestaurant() const;
-    OrderItem* getOrderItem() const;
+    vector<MenuItem> getItems() const;
     Payment* getPayment() const;
     string getStatus() const;
 
@@ -40,10 +41,9 @@ public:
     void setTotalPrice(double price);
     void setUser(User* user);
     void setRestaurant(Restaurant* restaurant);
-    void setOrderItem(OrderItem* orderItem);
+    void setItems(const vector<MenuItem>& items);
     void setPayment(Payment* payment);
     void setStatus(const string& status);
-
 
     void calculateTotal();
     string getOrderSummary() const;

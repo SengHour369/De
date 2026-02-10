@@ -1,4 +1,4 @@
-// Restaurant.cpp
+
 #include "Restaurant.h"
 using namespace std;
 

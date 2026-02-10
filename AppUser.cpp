@@ -1,17 +1,29 @@
-//
-// Created by seng hour on 1/31/2026.
-//
-
 #include "AppUser.h"
-
+#include "UserService.h"
+#include "RestaurantService.h"
+#include "OrderService.h"
+#include "User.h"
+#include "Restaurant.h"
+#include "MenuItem.h"
+#include "Order.h"
 #include <iostream>
+#include <vector>
 #include <string>
 
-#include "Order.h"
-#include "OrderService.h"
-
+#include "MenuItemService.h"
 using namespace std;
+
+
+void displayUserMenu();
+void displayRestaurantMenu();
+void displayProfile();
+void displayOrderMenu();
+void handleOrderManagement(UserService& userService, RestaurantService& restaurantService,
+                          OrderService& orderService);
+
+
 void displayUserMenu() {
+    cout << "\n=== USER MENU ===\n";
     cout << "1. View Profile\n";
     cout << "2. Update Profile\n";
     cout << "3. Change Password\n";
@@ -29,23 +41,16 @@ void displayRestaurantMenu() {
     cout << "5. Back to Main Menu\n";
     cout << "Enter your choice: ";
 }
+
 void displayProfile() {
-    cout << "1. View Profile\n";
-    cout << "2. View Restaurants\n";
+    cout << "\n=== USER PROFILE ===\n";
+    cout << "1. Profile Management\n";
+    cout << "2. Restaurant Browsing\n";
     cout << "3. Order Management\n";
+    cout << "4. Exit\n";
     cout << "Enter your choice: ";
 }
-//
-// void displayOrderMenu() {
-//     cout << "\n=== ORDER MANAGEMENT ===\n";
-//     cout << "1. Create New Order\n";
-//     cout << "2. View My Orders\n";
-//     cout << "3. Cancel Order\n";
-//     cout << "4. View Order Details\n";
-//     cout << "5. Process Payment\n";
-//     cout << "6. Back to Main Menu\n";
-//     cout << "Enter your choice: ";
-// }
+
 void displayOrderMenu() {
     cout << "\n=== ORDER MANAGEMENT ===\n";
     cout << "1. Create New Order\n";
@@ -69,14 +74,12 @@ void handleOrderManagement(UserService& userService, RestaurantService& restaura
 
         switch (orderChoice) {
             case 1: {
-                // Create order logic
                 User* currentUser = userService.getCurrentUser();
                 if (!currentUser) {
                     cout << "Please login first!\n";
                     break;
                 }
 
-                // Show available restaurants
                 vector<Restaurant> restaurants = restaurantService.getAllRestaurants();
                 if (restaurants.empty()) {
                     cout << "No restaurants available!\n";
@@ -101,7 +104,6 @@ void handleOrderManagement(UserService& userService, RestaurantService& restaura
                     break;
                 }
 
-                // Show menu items
                 vector<MenuItem> menu = restaurantService.getMenuByRestaurant(restaurantId);
                 if (menu.empty()) {
                     cout << "No menu items available!\n";
@@ -127,7 +129,6 @@ void handleOrderManagement(UserService& userService, RestaurantService& restaura
                     cin >> itemId;
                     cin.ignore();
 
-                    // Find and add the menu item
                     for (const MenuItem& item : menu) {
                         if (item.getId() == itemId && item.getAvailable()) {
                             selectedItems.push_back(item);
@@ -238,34 +239,30 @@ void handleOrderManagement(UserService& userService, RestaurantService& restaura
     }
 }
 
-AppUser::AppUser( UserService userService,RestaurantService restaurantService,OrderService& orderService) {
-    int userChoice;
-    bool inUserMenu = true;
+AppUser::AppUser(UserService& userService, RestaurantService& restaurantService, OrderService& orderService) {
     int n;
+    
     do {
         displayProfile();
-        cin>> n;
+        cin >> n;
+        cin.ignore();
+        
         switch (n) {
             case 1: {
+                bool inUserMenu = true;
                 while (inUserMenu) {
                     displayUserMenu();
+                    int userChoice;
                     cin >> userChoice;
                     cin.ignore();
 
                     switch (userChoice) {
-
                         case 1: {
                             User* currentUser = userService.getCurrentUser();
                             if (currentUser) {
-                                cout << "\n=== PROFILE ===\n";
-                                cout << "Username: " << currentUser->getUsername() << "\n";
-                                cout << "Email: " << currentUser->getEmail() << "\n";
-                                cout << "Phone: " << currentUser->getPhoneNumber() << "\n";
-                                cout << "Address: " << currentUser->getAddress() << "\n";
-                                cout << "Role: " << currentUser->getRole() << "\n";
-                                cout << "Status: " << currentUser->getStatus() << "\n";
-                            } else {
-                                cout << "Please login first!\n";
+                                vector<User> user;
+                                user.push_back(*currentUser);
+                                userService.display(user);
                             }
                             break;
                         }
@@ -322,6 +319,7 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService,Or
 
                         case 4:
                             userService.logout();
+                            inUserMenu = false;
                             break;
 
                         case 5:
@@ -335,7 +333,6 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService,Or
                 break;
             }
             case 2: {
-                //==============================================================================
                 int restChoice;
                 bool inRestMenu = true;
 
@@ -347,14 +344,7 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService,Or
                     switch (restChoice) {
                         case 1: {
                             vector<Restaurant> restaurants = restaurantService.getAllRestaurants();
-                            cout << "\n=== ALL RESTAURANTS ===\n";
-                            for (const Restaurant& rest : restaurants) {
-                                cout << "ID: " << rest.getId()
-                                     << " | Name: " << rest.getName()
-                                     << " | Category: " << rest.getCategory()
-                                     << " | Rating: " << rest.getRating() << "/5"
-                                     << " | Location: " << rest.getLocation() << "\n";
-                            }
+                            restaurantService.displayRestaurants(restaurantService.sortByName());
                             break;
                         }
 
@@ -364,33 +354,21 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService,Or
                             cin >> id;
                             cin.ignore();
                             Restaurant* restaurant = restaurantService.getRestaurantById(id);
-                            if (restaurant) {
-                                cout << "\n=== RESTAURANT DETAILS ===\n";
-                                cout << "ID: " << restaurant->getId() << "\n";
-                                cout << "Name: " << restaurant->getName() << "\n";
-                                cout << "Category: " << restaurant->getCategory() << "\n";
-                                cout << "Rating: " << restaurant->getRating() << "/5\n";
-                                cout << "Phone: " << restaurant->getPhoneNumber() << "\n";
-                                cout << "Location: " << restaurant->getLocation() << "\n";
-                            } else {
-                                cout << "Restaurant not found!\n";
-                            }
+                           vector<Restaurant> restaurants;
+                            restaurants.push_back(*restaurant);
+                            restaurantService.displayRestaurants(restaurants);
                             break;
                         }
+                        
                         case 3: {
                             int id;
                             cout << "Enter restaurant ID: ";
                             cin >> id;
                             cin.ignore();
                             vector<MenuItem> menu = restaurantService.getMenuByRestaurant(id);
-                            cout << "\n=== RESTAURANT MENU ===\n";
-                            for (const MenuItem& item : menu) {
-                                cout << "ID: " << item.getId()
-                                     << " | Name: " << item.getName()
-                                     << " | Price: $" << item.getPrice()
-                                     << " | Available: " << (item.getAvailable() ? "Yes" : "No") << "\n";
-                                cout << "   Description: " << item.getDescription() << "\n";
-                            }
+                            MenuItemService menuService;
+                            menuService.displayMenu(menu);
+
                             break;
                         }
 
@@ -413,20 +391,15 @@ AppUser::AppUser( UserService userService,RestaurantService restaurantService,Or
                         default:
                             cout << "Invalid choice!\n";
                     }
-
                 }
                 break;
-
             }
             case 3: {
-                handleOrderManagement( userService,  restaurantService,
-                          orderService);
+                handleOrderManagement(userService, restaurantService, orderService);
                 break;
             }
+            case 4:
+                return;
         }
-    }while (n != 4);
+    } while (n != 4);
 }
-
-
-
-

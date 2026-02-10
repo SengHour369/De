@@ -1,4 +1,4 @@
-// MenuItemService.h
+
 #ifndef RESTAURANT_PROJECT_MENUITEMSERVICE_H
 #define RESTAURANT_PROJECT_MENUITEMSERVICE_H
 
@@ -9,7 +9,7 @@
 
 class MenuItemService {
 private:
-    std::vector<MenuItem> menuItems;
+    vector<MenuItem> menuItems;
     FileStorage fileStorage;
 
 public:
@@ -21,16 +21,19 @@ public:
                        double price, bool available, int restaurantId);
 
     MenuItem* getMenuItemById(int id);
-    std::vector<MenuItem> getAllMenuItems() const;
-    std::vector<MenuItem> getMenuItemsByRestaurant(int restaurantId) const;
+    vector<MenuItem> getAllMenuItems() const;
+    vector<MenuItem> getMenuItemsByRestaurant(int restaurantId) const;
 
     bool updateMenuItem(int id, const std::string& name, const std::string& description,
                        double price, bool available);
 
     bool deleteMenuItem(int id);
+    void displayMenu(vector<MenuItem> menuitem);
+    vector<MenuItem> sortByName();
+    void header();
 
 
-    std::vector<MenuItem> searchMenuItemsByName(const std::string& name) const;
+    vector<MenuItem> searchMenuItemsByName(const std::string& name) const;
 
 
     bool updateMenuItemPrice(int id, double newPrice);

@@ -1,4 +1,4 @@
-// User.h
+
 #ifndef RESTAURANT_PROJECT_USER_H
 #define RESTAURANT_PROJECT_USER_H
 

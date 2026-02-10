@@ -1,10 +1,11 @@
-// MenuItemService.cpp
+
 #include "MenuItemService.h"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <cctype>
+#include <iomanip>
 using namespace std;
 
 MenuItemService::MenuItemService() : fileStorage("menuitems.dat") {
@@ -120,6 +121,57 @@ bool MenuItemService::deleteMenuItem(int id) {
 
     cout << "Error: Menu item not found with ID: " << id << "\n";
     return false;
+}
+
+void MenuItemService::displayMenu(vector<MenuItem> menuitem) {
+    if (menuItems.empty()) {
+        cout << "No menu items to display!\n";
+        return;
+    }
+
+    header();
+
+    for (const MenuItem& item : menuItems) {
+        cout << left
+             << setw(8) << item.getId()
+             << setw(25) << (item.getName().length() > 24 ? item.getName().substr(0, 22) + ".." : item.getName())
+             << setw(15) << item.getRestaurantId()
+             << setw(12) << "$" << fixed << setprecision(2) << item.getPrice()
+             << setw(15) << (item.getAvailable() ? "Yes" : "No")
+             << setw(25) << (item.getDescription().length() > 24 ?
+                             item.getDescription().substr(0, 23) + ".." :
+                             item.getDescription())
+             << endl;
+}
+
+cout << string(90, '=') << endl;
+}
+
+vector<MenuItem> MenuItemService::sortByName() {
+
+    vector<MenuItem> sortedItems = menuItems;
+    sort(sortedItems.begin(), sortedItems.end(),
+         [](const MenuItem& a, const MenuItem& b) {
+             return a.getName() < b.getName();
+         });
+
+    return sortedItems;
+}
+
+void MenuItemService::header() {
+    cout << "\n\t\t=== MENU ITEMS LIST ===\n";
+    cout << string(100, '=') << endl;
+
+    cout << left
+         << setw(8) << "ID"
+         << setw(25) << "Name"
+         << setw(15) << "Restaurant ID"
+         << setw(12) << "Price"
+         << setw(15) << "Available"
+         << setw(25) << "Description"
+         << endl;
+
+    cout << string(100, '-') << endl;
 }
 
 vector<MenuItem> MenuItemService::searchMenuItemsByName(const string& name) const {

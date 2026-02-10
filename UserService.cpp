@@ -1,32 +1,37 @@
-// UserService.cpp
+
 #include "UserService.h"
 #include <algorithm>
 #include <iostream>
-#include <sstream>
 #include <iomanip>
-#include <regex>
+
 using namespace std;
+
 
 UserService::UserService() : currentUserId(""), fileStorage("users.dat") {
     loadFromFile();
 
     if (users.empty()) {
-        users.push_back(User("admin", "admin123", "Male", "1980-01-01",
-                            "admin@restaurant.com", "Active", "555-0001",
-                            "Admin Street", "ADMIN"));
+        users.push_back(User(
+            "admin", "admin123", "Male", "1980-01-01",
+            "admin@restaurant.com", "Active",
+            "555-0001", "Admin Street", "ADMIN"
+        ));
         users[0].setId("USR0000");
         saveToFile();
         cout << "Created default admin user\n";
     }
 }
 
-UserService::UserService(const string& filename) : currentUserId(""), fileStorage(filename) {
+UserService::UserService(const string& filename)
+    : currentUserId(""), fileStorage(filename) {
     loadFromFile();
 
     if (users.empty()) {
-        users.push_back(User("admin", "admin123", "Male", "1980-01-01",
-                            "admin@restaurant.com", "Active", "555-0001",
-                            "Admin Street", "ADMIN"));
+        users.push_back(User(
+            "admin", "admin123", "Male", "1980-01-01",
+            "admin@restaurant.com", "Active",
+            "555-0001", "Admin Street", "ADMIN"
+        ));
         users[0].setId("USR0000");
         saveToFile();
         cout << "Created default admin user\n";
@@ -34,9 +39,9 @@ UserService::UserService(const string& filename) : currentUserId(""), fileStorag
 }
 
 bool UserService::registerUser(const string& username, const string& password,
-                              const string& gender, const string& date_of_birth,
-                              const string& email, const string& phone_number,
-                              const string& address, const string& role) {
+                               const string& gender, const string& date_of_birth,
+                               const string& email, const string& phone_number,
+                               const string& address, const string& role) {
 
     if (!isUsernameAvailable(username)) {
         cout << "Username already exists!\n";
@@ -54,15 +59,15 @@ bool UserService::registerUser(const string& username, const string& password,
     }
 
     if (!validateRole(role)) {
-        cout << "Invalid role! Must be 'ADMIN', 'STAFF', or 'CUSTOMER'\n";
+        cout << "Invalid role! Must be ADMIN, STAFF, or CUSTOMER\n";
         return false;
     }
 
-    User newUser(username, password, gender, date_of_birth, email,
-                "Active", phone_number, address, role);
+    User newUser(username, password, gender, date_of_birth,
+                 email, "Active", phone_number, address, role);
+
     newUser.setId(generateUserId());
     users.push_back(newUser);
-
     saveToFile();
 
     cout << "User registered successfully! ID: " << newUser.getId() << "\n";
@@ -71,18 +76,22 @@ bool UserService::registerUser(const string& username, const string& password,
 
 User UserService::login(const string& username, const string& password) {
     for (User& user : users) {
-        if (user.getUsername() == username && user.getPassword() == password) {
+        if (user.getUsername() == username &&
+            user.getPassword() == password) {
+
             if (user.getStatus() == "Active") {
                 currentUserId = user.getId();
                 cout << "Login successful! Welcome " << username << "\n";
                 return user;
             } else {
                 cout << "Account is not active!\n";
+                return User();
             }
         }
     }
-    cout << "Invalid username or password!\n";
 
+    cout << "Invalid username or password!\n";
+    return User();
 }
 
 bool UserService::logout() {
@@ -91,42 +100,43 @@ bool UserService::logout() {
         return false;
     }
 
-    User* currentUser = getCurrentUser();
-    if (currentUser) {
-        cout << "Goodbye " << currentUser->getUsername() << "!\n";
+    User* user = getCurrentUser();
+    if (user) {
+        cout << "Goodbye " << user->getUsername() << "!\n";
     }
 
-    currentUserId = "";
+    currentUserId.clear();
     return true;
 }
 
+
 bool UserService::updateProfile(const User& updatedUser) {
-    User* currentUser = getCurrentUser();
-    if (!currentUser) {
+    User* user = getCurrentUser();
+    if (!user) {
         cout << "No user is logged in!\n";
         return false;
     }
 
-    currentUser->setEmail(updatedUser.getEmail());
-    currentUser->setPhoneNumber(updatedUser.getPhoneNumber());
-    currentUser->setAddress(updatedUser.getAddress());
-    currentUser->setGender(updatedUser.getGender());
-    currentUser->setDateOfBirth(updatedUser.getDateOfBirth());
+    user->setEmail(updatedUser.getEmail());
+    user->setPhoneNumber(updatedUser.getPhoneNumber());
+    user->setAddress(updatedUser.getAddress());
+    user->setGender(updatedUser.getGender());
+    user->setDateOfBirth(updatedUser.getDateOfBirth());
 
     saveToFile();
-
     cout << "Profile updated successfully!\n";
     return true;
 }
 
-bool UserService::changePassword(const string& oldPassword, const string& newPassword) {
-    User* currentUser = getCurrentUser();
-    if (!currentUser) {
+bool UserService::changePassword(const string& oldPassword,
+                                 const string& newPassword) {
+    User* user = getCurrentUser();
+    if (!user) {
         cout << "No user is logged in!\n";
         return false;
     }
 
-    if (currentUser->getPassword() != oldPassword) {
+    if (user->getPassword() != oldPassword) {
         cout << "Current password is incorrect!\n";
         return false;
     }
@@ -136,41 +146,36 @@ bool UserService::changePassword(const string& oldPassword, const string& newPas
         return false;
     }
 
-    currentUser->setPassword(newPassword);
-
+    user->setPassword(newPassword);
     saveToFile();
 
     cout << "Password changed successfully!\n";
     return true;
 }
 
+
 User* UserService::getCurrentUser() {
-    if (currentUserId.empty()) {
-        return nullptr;
-    }
+    if (currentUserId.empty()) return nullptr;
 
     for (User& user : users) {
-        if (user.getId() == currentUserId) {
+        if (user.getId() == currentUserId)
             return &user;
-        }
     }
     return nullptr;
 }
 
 User* UserService::getUserById(const string& id) {
     for (User& user : users) {
-        if (user.getId() == id) {
+        if (user.getId() == id)
             return &user;
-        }
     }
     return nullptr;
 }
 
 User* UserService::getUserByUsername(const string& username) {
     for (User& user : users) {
-        if (user.getUsername() == username) {
+        if (user.getUsername() == username)
             return &user;
-        }
     }
     return nullptr;
 }
@@ -181,53 +186,98 @@ vector<User> UserService::getAllUsers() const {
 
 bool UserService::deleteUser(const string& userId) {
     auto it = remove_if(users.begin(), users.end(),
-        [userId](const User& user) { return user.getId() == userId; });
+        [&](const User& u) { return u.getId() == userId; });
 
-    if (it != users.end()) {
-        users.erase(it, users.end());
-
-        if (currentUserId == userId) {
-            currentUserId = "";
-        }
-
-        saveToFile();
-
-        cout << "User deleted successfully!\n";
-        return true;
+    if (it == users.end()) {
+        cout << "User not found!\n";
+        return false;
     }
 
-    cout << "User not found!\n";
-    return false;
+    users.erase(it, users.end());
+    if (currentUserId == userId)
+        currentUserId.clear();
+
+    saveToFile();
+    cout << "User deleted successfully!\n";
+    return true;
 }
 
-bool UserService::updateUserStatus(const string& userId, const string& status) {
+bool UserService::updateUserStatus(const string& userId,
+                                   const string& status) {
     User* user = getUserById(userId);
-    if (user) {
-        user->setStatus(status);
+    if (!user) return false;
 
-        saveToFile();
+    user->setStatus(status);
+    saveToFile();
 
-        cout << "User status updated to: " << status << "\n";
-        return true;
+    cout << "User status updated to: " << status << "\n";
+    return true;
+}
+
+
+vector<User> UserService::sortByName() {
+    vector<User> sortedUsers = users;
+
+    sort(sortedUsers.begin(), sortedUsers.end(),
+         [](const User& a, const User& b)->bool{
+             return a.getUsername() < b.getUsername();
+         });
+
+    return sortedUsers;
+}
+
+void UserService::header() {
+    cout << "\n\t\t=== Customer List ===\n";
+    cout << string(85, '=') << endl;
+
+    cout << left
+         << setw(10) << "ID"
+         << setw(15) << "Username"
+         << setw(15) << "Password"
+         << setw(10) << "Gender"
+         << setw(20) << "Email"
+         << setw(10) << "Status"
+         << setw(12) << "Role"
+
+         << endl;
+
+    cout << string(85, '-') << endl;
+}
+
+void UserService::display(const vector<User> list) {
+    if (list.empty()) {
+        cout << "No users to display!\n";
+        return;
     }
-    return false;
+
+    header();
+
+    for (const User& user : list) {
+        cout << left
+             << setw(10) << user.getId()
+             << setw(15) << user.getUsername()
+             << setw(15) << user.getPassword()
+             << setw(10) << user.getGender()
+             << setw(20) << user.getEmail()
+             << setw(10) << user.getStatus()
+             << setw(12) << user.getRole()
+             << endl;
+    }
+
+    cout << string(85, '=') << endl;
 }
 
 bool UserService::isUsernameAvailable(const string& username) const {
-    for (const User& user : users) {
-        if (user.getUsername() == username) {
+    for (const User& u : users)
+        if (u.getUsername() == username)
             return false;
-        }
-    }
     return true;
 }
 
 bool UserService::isEmailAvailable(const string& email) const {
-    for (const User& user : users) {
-        if (user.getEmail() == email) {
+    for (const User& u : users)
+        if (u.getEmail() == email)
             return false;
-        }
-    }
     return true;
 }
 
@@ -239,7 +289,7 @@ string UserService::generateUserId() {
 }
 
 bool UserService::validateRole(const string& role) {
-    return (role == "ADMIN" || role == "STAFF" || role == "CUSTOMER");
+    return role == "ADMIN" || role == "STAFF" || role == "CUSTOMER";
 }
 
 bool UserService::saveToFile() {

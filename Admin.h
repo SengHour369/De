@@ -1,10 +1,15 @@
 #ifndef RESTAURANT_PROJECT_ADMIN_H
 #define RESTAURANT_PROJECT_ADMIN_H
 
-#include "RestaurantService.h"
-#include "MenuItemService.h"
-#include "UserService.h"
 #include <vector>
+#include <string>
+
+class RestaurantService;
+class MenuItemService;
+class UserService;
+class Restaurant;
+class MenuItem;
+class User;
 
 class Admin {
 private:
@@ -24,10 +29,10 @@ public:
     void displayAdminDashboard();
 
 private:
+    void displayAdminMainMenu();
     void displayRestaurantMenu();
     void displayMenuItemMenu();
     void displayUserMenu();
-    void displayAdminMainMenu();
 };
 
 #endif // RESTAURANT_PROJECT_ADMIN_H

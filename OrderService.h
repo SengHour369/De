@@ -4,14 +4,15 @@
 #include <vector>
 #include <string>
 #include "Order.h"
-#include "OrderItem.h"
 #include "Payment.h"
 #include "MenuItem.h"
+
+class User;
+class Restaurant;
 
 class OrderService {
 private:
     vector<Order*> orders;
-    vector<OrderItem*> orderItems;
     vector<Payment*> payments;
 
 public:
@@ -33,10 +34,6 @@ public:
     vector<Order*> getAllOrders() const;
 
 
-    OrderItem* createOrderItem(const vector<MenuItem>& items, int quantity);
-    bool updateOrderItemQuantity(int itemId, int newQuantity);
-
-
     Payment* createPayment(double amount, const string& paymentType);
     bool processPayment(int paymentId);
     vector<Payment*> getPaymentHistory(const string& userId) const;
@@ -47,12 +44,11 @@ public:
     vector<Order*> getRecentOrders(int limit = 10) const;
 
 
-    double calculateOrderTotal(const vector<MenuItem>& items, int quantity) const;
+    double calculateOrderTotal(const vector<MenuItem>& items, int quantity = 1) const;
     string generateOrderSummary(const Order* order) const;
 
 private:
     int generateOrderId();
-    int generateOrderItemId();
     int generatePaymentId();
 };
 

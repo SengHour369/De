@@ -1,39 +1,45 @@
-//
-// Created by seng hour on 1/31/2026.
-//
-
 #include "LogIn.h"
-
+#include "UserService.h"
+#include "Admin.h"
+#include "RestaurantService.h"
+#include "OrderService.h"
 #include "AppUser.h"
+#include "User.h"
+#include <iostream>
+#include <string>
+using namespace std;
 
-LogIn::LogIn(UserService userService, Admin admin,RestaurantService restaurantService,OrderService& orderService) {
+LogIn::LogIn(UserService& userService, Admin& admin, RestaurantService& restaurantService, OrderService& orderService) {
     int n;
 
-    do{
+    do {
         cout << "\n=== USER MANAGEMENT ===\n";
         cout << "1. Register\n";
         cout << "2. Login\n";
+        cout << "3. Back to Main Menu\n";
         cout << "Enter your choice: ";
-        cin>>n;
+        cin >> n;
+        cin.ignore();
+        
         switch (n) {
             case 1: {
                 string username, password, gender, dob, email, phone, address, role;
                 cout << "Enter username: ";
-                cin>>username;
+                getline(cin, username);
                 cout << "Enter password: ";
-                cin>> password;
+                getline(cin, password);
                 cout << "Enter gender: ";
-                cin>>gender;
+                getline(cin, gender);
                 cout << "Enter date of birth (YYYY-MM-DD): ";
-                cin>>dob;
+                getline(cin, dob);
                 cout << "Enter email: ";
-                cin>>email;
+                getline(cin, email);
                 cout << "Enter phone number: ";
-                cin>>phone;
+                getline(cin, phone);
                 cout << "Enter address: ";
-                cin>>address;
+                getline(cin, address);
                 cout << "Enter role (ADMIN/STAFF/CUSTOMER): ";
-                cin>> role;
+                getline(cin, role);
 
                 userService.registerUser(username, password, gender, dob,
                                        email, phone, address, role);
@@ -41,22 +47,26 @@ LogIn::LogIn(UserService userService, Admin admin,RestaurantService restaurantSe
             }
 
             case 2: {
-
                 string username, password;
                 cout << "Enter username: ";
-                cin>> username;
+                getline(cin, username);
                 cout << "Enter password: ";
-                cin>> password;
+                getline(cin, password);
 
-                if (  userService.login(username, password).getRole() == "ADMIN") {
-                    admin.runAdminMenu();
+                User loggedInUser = userService.login(username, password);
+                if (!loggedInUser.getRole().empty()) {
+                    if (loggedInUser.getRole() == "ADMIN") {
+                        admin.runAdminMenu();
+                    } else {
+                        AppUser appUser(userService, restaurantService, orderService);
+                    }
                 }
-                else {
-                    new AppUser(userService,restaurantService, orderService);
-                }
-
                 break;
             }
+            case 3:
+                return;
+            default:
+                cout << "Invalid choice!\n";
         }
-    }while(n!=3);
+    } while (n != 3);
 }

@@ -1,8 +1,9 @@
-// RestaurantService.cpp
+
 #include "RestaurantService.h"
 #include "MenuItemService.h"
 #include <algorithm>
 #include <iostream>
+#include<iomanip>
 using namespace std;
 
 RestaurantService::RestaurantService() : menuItemService(nullptr), fileStorage("restaurants.dat") {
@@ -136,8 +137,59 @@ vector<MenuItem> RestaurantService::getMenuByRestaurant(int restaurantId) const 
     return vector<MenuItem>();
 }
 
+void RestaurantService::header() {
+    cout << "\n\t\t=== RESTAURANT LIST ===\n";
+    cout << string(90, '=') << endl;
+
+    cout << left
+         << setw(10) << "ID"
+         << setw(25) << "Restaurant Name"
+         << setw(20) << "Category"
+         << setw(10) << "Rating"
+         << setw(25) << "Location"
+         << endl;
+
+    cout << string(90, '-') << endl;
+}
+
+void RestaurantService::displayRestaurants( vector<Restaurant> restaurants) {
+    if (restaurants.empty()) {
+        cout << "No restaurants to display!\n";
+        return;
+    }
+
+    header();
+
+    for (const Restaurant& restaurant : restaurants) {
+        cout << left
+             << setw(10) << restaurant.getId()
+             << setw(25) << restaurant.getName()
+             << setw(20) << restaurant.getCategory()
+             << setw(10) << fixed << setprecision(1) << restaurant.getRating() << "/5"
+             << setw(25) << restaurant.getLocation()
+             << endl;
+    }
+
+    cout << string(90, '=') << endl;
+}
+
+
+
+vector<Restaurant> RestaurantService::sortByName() {
+
+    vector<Restaurant> sortedRestaurants = restaurants;
+
+    // . Sort using a lambda comparing names
+    std::sort(sortedRestaurants.begin(), sortedRestaurants.end(),
+              [](const Restaurant& a, const Restaurant& b) {
+                  return a.getName() < b.getName();
+              });
+
+
+    return sortedRestaurants;
+}
 bool RestaurantService::addMenuItem(int restaurantId, const string& name,
-                                  const string& description, double price) {
+                                    const string& description, double price) {
     Restaurant* restaurant = getRestaurantById(restaurantId);
     if (!restaurant) {
         cout << "Restaurant not found!\n";
@@ -147,7 +199,7 @@ bool RestaurantService::addMenuItem(int restaurantId, const string& name,
     if (menuItemService) {
         bool result = menuItemService->createMenuItem(name, description, price, true, restaurantId);
         if (result) {
-            saveToFile(); // Save after adding menu item
+            saveToFile();
         }
         return result;
     }

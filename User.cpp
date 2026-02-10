@@ -1,4 +1,4 @@
-// User.cpp
+
 #include "User.h"
 
 User::User() : id(""), username(""), password(""), gender(""), 

@@ -1,4 +1,4 @@
-// MenuItem.cpp
+
 #include "MenuItem.h"
 
 MenuItem::MenuItem() : id(0), name(""), description(""),

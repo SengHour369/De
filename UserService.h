@@ -1,4 +1,4 @@
-// UserService.h
+
 #ifndef RESTAURANT_PROJECT_USERSERVICE_H
 #define RESTAURANT_PROJECT_USERSERVICE_H
 
@@ -38,12 +38,14 @@ public:
 
     bool deleteUser(const string& userId);
     bool updateUserStatus(const string& userId, const string& status);
+    vector<User>  sortByName();
 
 
     bool isUsernameAvailable(const string& username) const;
     bool isEmailAvailable(const string& email) const;
+    void display(vector<User> users);
+    void header();
 
-    // File storage methods
     bool saveToFile();
     bool loadFromFile();
     void setDataFilename(const string& filename);
